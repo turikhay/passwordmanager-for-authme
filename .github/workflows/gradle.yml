@@ -1,0 +1,61 @@
+name: Gradle
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      include-all-deps:
+        type: boolean
+        default: false
+      task:
+        type: string
+        default: build
+      artifact-name:
+        type: string
+        default: gradle-build
+    outputs:
+      artifact-glob:
+        value: ${{ jobs.build.outputs.artifact-glob }}
+    secrets:
+      modrinth-token:
+        required: false
+
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Gradle build
+    runs-on: ubuntu-latest
+    env:
+      ARTIFACT_GLOB: fabric/*/build/libs/*.jar
+    outputs:
+      artifact-glob: ${{ env.ARTIFACT_GLOB }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Gradle wrapper
+        uses: gradle/wrapper-validation-action@v2
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Run the build
+        run: |
+          ./gradlew \
+          ${{ inputs.task }} \
+          -Pversion=${{ inputs.version }} \
+          -Pfabric_modIncludeAll=${{ inputs.include-all-deps }}
+        env:
+          MODRINTH_TOKEN: ${{ secrets.modrinth-token }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact-name }}
+          path: |
+            .empty
+            ${{ env.ARTIFACT_GLOB }}

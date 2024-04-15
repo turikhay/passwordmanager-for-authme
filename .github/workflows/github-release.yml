@@ -1,0 +1,53 @@
+name: GitHub release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  version:
+    name: Detect version
+    uses: ./.github/workflows/version.yml
+  build:
+    name: Build
+    needs: version
+    uses: ./.github/workflows/gradle.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      artifact-name: gradle-def
+  build-all:
+    name: Build (all deps)
+    needs: version
+    uses: ./.github/workflows/gradle.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      artifact-name: gradle-all
+      include-all-deps: true
+  release:
+    name: Prepare release
+    needs:
+      - version
+      - build
+      - build-all
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: gradle-def
+      - name: Download "fat" artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: gradle-all
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ needs.version.outputs.version }}
+          prerelease: ${{ needs.version.outputs.pre-release }}
+          generate_release_notes: true
+          draft: true
+          files: |
+            ${{ needs.build-all.outputs.artifact-glob }}

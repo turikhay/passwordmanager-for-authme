@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "package": "com.turikhay.mc.pwam.fabric.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "ChatScreenMixin",
+    "CommandNodeAccessor",
+    "CommandSourceMixin",
+    "CommandTreeMixin",
+    "LocalSuggestionProviderAccessor",
+    "ModifyCmdChatScreenMixin",
+    "ModifyCmdScreenMixin",
+    "TextFieldWidgetMixin"
+  ]
+}

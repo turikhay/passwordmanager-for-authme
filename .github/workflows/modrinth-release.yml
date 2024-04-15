@@ -1,0 +1,17 @@
+name: Modrinth release
+
+on: workflow_dispatch
+
+jobs:
+  version:
+    name: Detect version
+    uses: ./.github/workflows/version.yml
+  upload:
+    name: Build and upload
+    needs: version
+    uses: ./.github/workflows/gradle.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+      task: modrinth
+    secrets:
+      modrinth-token: ${{ secrets.MODRINTH_TOKEN }}

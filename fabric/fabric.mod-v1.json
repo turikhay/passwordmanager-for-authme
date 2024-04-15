@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "id": "pwam",
+  "name": "PasswordManager for AuthMe",
+  "authors": [
+    "turikhay"
+  ],
+  "contact": {
+    "homepage": "https://github.com/turikhay/password-manager-authme",
+    "sources": "https://github.com/turikhay/password-manager-authme"
+  },
+  "license": "MIT",
+  "icon": "assets/pwam/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "main": [
+      "com.turikhay.mc.pwam.fabric.PWAM"
+    ]
+  },
+  "mixins": [
+    "pwam.mixins.json"
+  ]
+}

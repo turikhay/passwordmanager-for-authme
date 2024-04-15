@@ -1,0 +1,9 @@
+{
+  "pwam.prefix": "[PWAM]",
+  "pwam.prefix.hover": "Password Manager for AuthMe",
+  "pwam.pwd-pattern-hover": "Click to copy the password",
+  "pwam.cmd.input.mistake": "Please check your command. There must be a mistake.",
+  "pwam.cmd.input.notification": "Last command has used your password on this server",
+  "pwam.cmd.input.updated": "Your new password on this server: %s",
+  "pwam.cmd.input.updated.hover": "Click to copy your new password"
+}
