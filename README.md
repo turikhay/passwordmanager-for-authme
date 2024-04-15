@@ -44,7 +44,7 @@ Your password will be securely stored for future use.
 
 ### Registering on a new server
 
-When registering on a new server, enter **/register** (or **/reg** if available).
+When registering on a new server, enter */register* (or */reg* if available).
 PWAM will offer a securely generated password for you to use.
 You can choose to use this suggestion or enter a password of your own.
 Either way, PWAM will save your new password.
