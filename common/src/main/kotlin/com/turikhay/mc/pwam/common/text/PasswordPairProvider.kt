@@ -2,7 +2,7 @@ package com.turikhay.mc.pwam.common.text
 
 import java.util.concurrent.CompletableFuture
 
-class PasswordPairProvider (
+data class PasswordPairProvider (
     val password: TextProvider,
     val pattern: TextProvider,
 ) {
