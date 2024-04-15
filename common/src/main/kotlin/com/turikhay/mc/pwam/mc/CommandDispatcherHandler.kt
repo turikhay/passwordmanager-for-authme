@@ -3,7 +3,7 @@ package com.turikhay.mc.pwam.mc
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.arguments.StringArgumentType
-import com.mojang.brigadier.builder.LiteralArgumentBuilder
+import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
 import com.mojang.brigadier.context.CommandContext
@@ -139,7 +139,7 @@ class CommandDispatcherHandler(
         labels.addAll(processed)
         for (label in processed) {
             customDispatcher.register(
-                LiteralArgumentBuilder.literal<ICommandSource>(label)
+                literal<ICommandSource>(label)
                     .then(commandArgs)
             )
         }
