@@ -6,7 +6,7 @@ private val LOCKED = "\uD83D\uDD12" // https://emojipedia.org/locked
 
 data class PasswordPattern(
     private val supportsLockEmoji: Boolean
-) {
+) : PasswordPatternDetector {
     fun patternOf(pwd: String): String {
         if (pwd.length < 3) {
             return pwd
@@ -20,7 +20,7 @@ data class PasswordPattern(
         return b.toString()
     }
 
-    fun containsPattern(str: String): Boolean {
+    override fun containsPattern(str: String): Boolean {
         return if (supportsLockEmoji) {
             str.contains("*$LOCKED")
         } else {
