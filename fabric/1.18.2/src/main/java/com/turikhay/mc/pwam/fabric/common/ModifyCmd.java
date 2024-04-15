@@ -25,7 +25,7 @@ public interface ModifyCmd {
             );
             return "";
         }
-        return session.getCommandRewriter().rewriteCommand(command);
+        return session.getCommandRewriter().rewriteNow(command);
     }
 
     static String modifyCmd(String line, ICommandSource cmdSource) {

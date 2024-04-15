@@ -6,9 +6,12 @@ import com.turikhay.mc.pwam.common.text.Pairs
 import com.turikhay.mc.pwam.common.PasswordChangeCallback
 import com.turikhay.mc.pwam.common.PasswordPattern
 import com.turikhay.mc.pwam.common.PatternCommandRewriter
+import io.github.oshai.kotlinlogging.KotlinLogging
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.concurrent.CompletableFuture
+
+private val logger = KotlinLogging.logger {}
 
 class KnownCommandHandler(
     private val platformCommandDispatcher: PlatformCommandDispatcher,
@@ -115,10 +118,14 @@ class KnownCommandHandler(
             if (updatePassword) {
                 changePassword(newPassword)
             }
-            platformCommandDispatcher.dispatchCommand(
-                patternCommandRewriter.rewriteCommand(ctx.input),
-                ctx.input
-            )
+            patternCommandRewriter.rewriteLater(ctx.input).thenAccept { cmd ->
+                platformCommandDispatcher.dispatchCommand(cmd, ctx.input)
+            }.whenComplete { _, t ->
+                if (t != null) {
+                    logger.error(t) { "Error sending or rewriting the command: ${ctx.input}" }
+                    notificator.errorOccurred()
+                }
+            }
         }
     }
 
