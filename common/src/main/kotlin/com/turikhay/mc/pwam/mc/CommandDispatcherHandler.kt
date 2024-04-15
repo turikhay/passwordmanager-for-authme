@@ -171,27 +171,47 @@ class CommandDispatcherHandler(
     ): List<String> {
         val processed = ArrayList<String>()
         for (name in names) {
-            val node = vanillaDispatcher.root.getChild(name) ?: continue
+            val node = vanillaDispatcher.root.getChild(name)
+            if (node == null) {
+                logger.info { "Command doesn't exist: $name" }
+                continue
+            }
             logger.info { "Processing command: $node" }
-            val args = nodeAccessor.getChildren(node)["args"]!!
-            if (args !is ArgumentCommandNode<*, *>) {
-                logger.info { "command has no args, skipping" }
-                continue
-            }
-            val provider = args.customSuggestions
-            if (provider == null) {
-                logger.info { "command has no registered providers, skipping" }
-                continue
-            }
-            if (askServerSuggestion.isAskServerSuggestion(provider)) {
-                logger.debug { "clearing command data" }
-                nodeAccessor.getChildren(node).clear()
-                nodeAccessor.getArguments(node).clear()
-            } else {
-                logger.warn { "Command uses custom suggestions" }
+            val children = nodeAccessor.getChildren(node)
+            if (children.isNotEmpty()) {
+                val i = children.iterator()
+                while (i.hasNext()) {
+                    val entry = i.next()
+                    logger.info { "Processing entry: $entry" }
+                    val value = entry.value
+                    if (value is ArgumentCommandNode<*, *>) {
+                        val provider = value.customSuggestions
+                        if (provider != null) {
+                            if (askServerSuggestion.isAskServerSuggestion(provider)) {
+                                logger.info { "Clearing command data for ${entry.key}" }
+                                i.remove()
+                                nodeAccessor.getArguments(node).remove(entry.key)
+                            } else {
+                                logger.warn { "Command uses custom suggestions" }
+                            }
+                        } else {
+                            logger.info { "leaf has no suggestions whatsoever" }
+                        }
+                    }
+                }
             }
             node.addChild(augmentedNode)
             processed.add(name)
+        }
+        if (processed.isEmpty()) {
+            logger.warn { "No commands were processed. We'll register them in the vanilla dispatcher anyway" }
+            for (name in names) {
+                vanillaDispatcher.register(
+                    literal<ICommandSource>(name)
+                        .then(augmentedNode)
+                )
+            }
+            processed.addAll(names)
         }
         return processed
     }
