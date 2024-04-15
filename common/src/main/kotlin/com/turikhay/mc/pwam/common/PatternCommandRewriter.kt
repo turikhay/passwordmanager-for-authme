@@ -23,21 +23,15 @@ class PatternCommandRewriter(
         try {
             dispatch = doRewrite(
                 cmd,
-                providersMapSeq().filter {
-                    val done = it.second.isDone
-                    if (!done) {
-                        logger.warn { "Pair is not yet resolved: ${it.first}" }
-                    }
-                    done
-                }.map {
+                providersMapSeq().map {
+                    require(it.second.isDone) { "Pair has not resolved yet: ${it.first}" }
                     it.second.get()
                 },
             )
         } catch (e: Exception) {
             logger.error(e) { "Error processing the command: $cmd" }
-            dispatch = cmd
+            dispatch = ""
         }
-        logger.info { "Will dispatch: $dispatch" }
         return dispatch
     }
 
