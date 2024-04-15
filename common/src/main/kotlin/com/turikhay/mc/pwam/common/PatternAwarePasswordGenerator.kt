@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 
 private val logger = KotlinLogging.logger {}
 
-class PatternAwarePasswordGenerator(
+data class PatternAwarePasswordGenerator(
     private val delegate: TextProvider,
     private val patternFactory: PasswordPattern,
     private val patternProvider: TextProvider,

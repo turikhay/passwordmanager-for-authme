@@ -3,7 +3,7 @@ package com.turikhay.mc.pwam.common.text
 import com.turikhay.mc.pwam.common.Invalidatable
 import java.util.concurrent.CompletableFuture
 
-class CacheableTextProvider(
+data class CacheableTextProvider(
     private val delegate: TextProvider
 ) : TextProvider, Invalidatable {
     private var cached: CompletableFuture<String?>? = null

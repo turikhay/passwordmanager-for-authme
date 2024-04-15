@@ -4,7 +4,7 @@ import com.turikhay.mc.pwam.common.text.TextProvider
 
 private val LOCKED = "\uD83D\uDD12" // https://emojipedia.org/locked
 
-class PasswordPattern(
+data class PasswordPattern(
     private val supportsLockEmoji: Boolean
 ) {
     fun patternOf(pwd: String): String {
