@@ -69,6 +69,7 @@ class Session(
     val commandRewriter = PatternCommandRewriter(
         pairs.asList(),
         notificator,
+        pattern,
     )
 
     val commandDispatcherHandler = CommandDispatcherHandler(
