@@ -114,8 +114,6 @@ class KnownCommandHandler(
             }
             if (updatePassword) {
                 changePassword(newPassword)
-            } else {
-                notificator.passwordUseNotification()
             }
             platformCommandDispatcher.dispatchCommand(
                 patternCommandRewriter.rewriteCommand(ctx.input),
