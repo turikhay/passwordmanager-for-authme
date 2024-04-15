@@ -28,6 +28,9 @@ public abstract class ModifyCmdChatScreenMixin {
     private String modifyCommand(String line) {
         // reset memoized og cmd
         this.maskedCommand = null;
+        if (!line.startsWith("/")) {
+            return line;
+        }
         String newCommand = ModifyCmd.modifyCmd(
                 this.normalize(line),
                 (ICommandSource) MinecraftClient.getInstance()
