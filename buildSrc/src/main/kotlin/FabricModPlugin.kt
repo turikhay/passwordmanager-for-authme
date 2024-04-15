@@ -250,7 +250,7 @@ class FabricModPlugin : Plugin<Project> {
             changelog = provider {
                 """
                     Changelog is available on
-                    [GitHub](https://github.com/turikhay/pwam-wip/releases/tag/v${project.version})
+                    [GitHub](https://github.com/turikhay/passwordmanager-for-authme/releases/tag/v${project.version})
                 """.trimIndent()
             }
             versionType = provider {
