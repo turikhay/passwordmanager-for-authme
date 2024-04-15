@@ -13,16 +13,17 @@ class PatternCommandRewriter(
     fun rewriteCommand(cmd: String): String {
         var dispatch = cmd
         try {
-            val pairMap = providers.map { provider ->
+            val pairs = providers.asSequence().map { provider ->
                 provider to provider.queryBoth()
-            }
-            val pairs = pairMap.filter {
+            }.filter {
                 val done = it.second.isDone
                 if (!done) {
                     logger.warn { "Pair is not resolved: ${it.first}" }
                 }
                 done
-            }.map { it.second.get() }
+            }.map {
+                it.second.get()
+            }
             var r = cmd
             for (pair in pairs) {
                 if (pair != null) {
@@ -36,6 +37,7 @@ class PatternCommandRewriter(
         } catch (e: Exception) {
             logger.error(e) { "Error processing the command: $cmd" }
         }
+        logger.info { "Will dispatch: $dispatch" }
         return dispatch
     }
 }
