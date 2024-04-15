@@ -66,9 +66,15 @@ class Session(
         pattern
     )
 
+    val commandRewriter = PatternCommandRewriter(
+        pairs.asList(),
+        notificator,
+    )
+
     val commandDispatcherHandler = CommandDispatcherHandler(
         KnownCommandHandler(
             client,
+            commandRewriter,
             pairs,
             this,
             notificator,
@@ -87,11 +93,6 @@ class Session(
         ),
         client,
         executor,
-    )
-
-    val commandRewriter = PatternCommandRewriter(
-        pairs.asList(),
-        notificator,
     )
 
     override fun changePassword(newPassword: String) {

@@ -5,12 +5,14 @@ import com.turikhay.mc.pwam.common.text.PasswordPairProvider
 import com.turikhay.mc.pwam.common.text.Pairs
 import com.turikhay.mc.pwam.common.PasswordChangeCallback
 import com.turikhay.mc.pwam.common.PasswordPattern
+import com.turikhay.mc.pwam.common.PatternCommandRewriter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.format.NamedTextColor
 import java.util.concurrent.CompletableFuture
 
 class KnownCommandHandler(
     private val platformCommandDispatcher: PlatformCommandDispatcher,
+    private val patternCommandRewriter: PatternCommandRewriter,
     private val pairs: Pairs,
     private val passwordChangeCallback: PasswordChangeCallback,
     private val notificator: Notificator,
@@ -22,9 +24,7 @@ class KnownCommandHandler(
         pairs.login,
         ctx,
         forceUpdatesPassword = false,
-    ) { label, pw ->
-        "$label $pw"
-    }
+    )
 
     fun onRegisterCommand(
         ctx: CommandContext<*>,
@@ -38,9 +38,7 @@ class KnownCommandHandler(
             pairs.register,
             ctx,
             forceUpdatesPassword = true,
-        ) { label, pw ->
-            "$label $pw $pw"
-        }
+        )
     }
 
     fun onChangePasswordCommand(
@@ -100,10 +98,9 @@ class KnownCommandHandler(
         pairProvider: PasswordPairProvider,
         ctx: CommandContext<*>,
         forceUpdatesPassword: Boolean,
-        rewriter: (String, String) -> String
+
     ) {
         val pwArg = ctx.getArgument("password")
-        val restArg = ctx.getArgumentSafely("") ?: ""
         pairProvider.queryBoth().thenAccept { pair ->
             var updatePassword = forceUpdatesPassword
             val newPassword = if (pair != null && pwArg == pair.pattern) {
@@ -121,7 +118,7 @@ class KnownCommandHandler(
                 notificator.passwordUseNotification()
             }
             platformCommandDispatcher.dispatchCommand(
-                "${rewriter(ctx.getLabel(), newPassword)} $restArg",
+                patternCommandRewriter.rewriteCommand(ctx.input),
                 ctx.input
             )
         }
