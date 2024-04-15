@@ -15,11 +15,11 @@ class PatternAwarePasswordGeneratorTest {
     fun `fails on non-unique password`() {
         val patternFactory = PasswordPattern(true)
         val f = PatternAwarePasswordGenerator(
-            provideText(executor) {
+            provideText("same", executor) {
                 "same"
             },
             patternFactory,
-            provideText(executor) {
+            provideText("pattern of same", executor) {
                 patternFactory.patternOf("same")
             },
             1,
@@ -38,7 +38,7 @@ class PatternAwarePasswordGeneratorTest {
         val patternFactory = PasswordPattern(true)
         val cnt = AtomicInteger(4)
         val f = PatternAwarePasswordGenerator(
-            provideText(executor) {
+            provideText("unique", executor) {
                 arrayOf(
                     "unique",
                     "non-unique",
@@ -47,7 +47,7 @@ class PatternAwarePasswordGeneratorTest {
                 )[cnt.decrementAndGet()]
             },
             patternFactory,
-            provideText(executor) {
+            provideText("non-unique pattern", executor) {
                 patternFactory.patternOf("non-unique")
             },
             99,

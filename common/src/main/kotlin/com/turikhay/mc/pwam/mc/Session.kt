@@ -17,7 +17,7 @@ class Session(
 ) : PasswordChangeCallback, Invalidatable, Disposable {
 
     private val registerPwdProvider = CacheableTextProvider(
-        provideText(executor) {
+        provideText("register", executor) {
             generatePassword(12)
         }
     )
@@ -28,7 +28,7 @@ class Session(
 
     private val loginPwdProvider = CacheableTextProvider(
         PatternAwarePasswordGenerator(
-            provideText(executor) {
+            provideText("login", executor) {
                 transaction(db) {
                     getPassword(info.username, info.server)
                 }
