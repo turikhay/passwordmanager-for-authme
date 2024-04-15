@@ -10,9 +10,15 @@ private val logger = KotlinLogging.logger {}
 
 class PatternCommandRewriter(
     private val providers: List<PasswordPairProvider>,
-    private val notificator: Notificator
+    private val notificator: Notificator,
+    private val patternDetector: PasswordPatternDetector,
 ) {
     fun rewriteNow(cmd: String): String {
+        if (!patternDetector.containsPattern(cmd)) {
+            logger.info { "Command doesn't contain a pattern" }
+            return cmd
+        }
+        logger.info { "Command contains a pattern" }
         var dispatch: String
         try {
             dispatch = doRewrite(
