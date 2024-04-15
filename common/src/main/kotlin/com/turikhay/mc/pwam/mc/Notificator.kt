@@ -28,6 +28,10 @@ class Notificator(
             )
     }
 
+    fun errorOccurred() = send {
+        Component.translatable("pwam.error")
+    }
+
     fun send(comp: () -> Component) {
         audienceProvider.sendMessage(
             Component.empty()
