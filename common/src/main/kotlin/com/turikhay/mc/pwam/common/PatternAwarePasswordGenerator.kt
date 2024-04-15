@@ -1,6 +1,5 @@
 package com.turikhay.mc.pwam.common
 
-import com.turikhay.mc.pwam.common.text.CacheableTextProvider
 import com.turikhay.mc.pwam.common.text.TextProvider
 import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.concurrent.CompletableFuture
@@ -12,7 +11,7 @@ data class PatternAwarePasswordGenerator(
     private val patternFactory: PasswordPattern,
     private val patternProvider: TextProvider,
     private val maxAttempts: Int,
-) : TextProvider {
+) : TextProvider, Invalidatable {
     override fun get(): CompletableFuture<String?> =
         patternProvider.get().thenCompose { existingPattern ->
             generateUntilUnique(existingPattern)
@@ -36,7 +35,7 @@ data class PatternAwarePasswordGenerator(
             future.completeExceptionally(NonUniquePatternException())
             return
         }
-        if (delegate is CacheableTextProvider) {
+        if (delegate is Invalidatable) {
             delegate.invalidate()
         }
         delegate.get().whenComplete { pwd, t ->
@@ -62,6 +61,15 @@ data class PatternAwarePasswordGenerator(
                     future.complete(pwd)
                 }
             }
+        }
+    }
+
+    override fun invalidate() {
+        if (delegate is Invalidatable) {
+            delegate.invalidate()
+        }
+        if (patternProvider is Invalidatable) {
+            patternProvider.invalidate()
         }
     }
 

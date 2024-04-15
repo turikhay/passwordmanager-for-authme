@@ -16,6 +16,9 @@ data class CacheableTextProvider(
     }
 
     override fun invalidate() {
+        if (delegate is Invalidatable) {
+            delegate.invalidate()
+        }
         cached = null
     }
 }
