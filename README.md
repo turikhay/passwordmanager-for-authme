@@ -1,4 +1,4 @@
-![Password Manager for AuthMe](https://i.imgur.com/oS5ZwIa.png)
+![Password Manager for AuthMe](https://i.imgur.com/jDDh3AP.png)
 
 # Password Manager for AuthMe (PWAM)
 
