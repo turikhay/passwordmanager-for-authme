@@ -49,7 +49,7 @@ PWAM will offer a securely generated password for you to use.
 You can choose to use this suggestion or enter a password of your own.
 Either way, PWAM will save your new password.
 
-![reg_2](https://i.imgur.com/Tbvdwl0.gif)
+![reg_2](https://i.imgur.com/tybNrsd.gif)
 
 ### What if I do something wrong?
 
