@@ -6,7 +6,7 @@ Password Manager aims to enhance security across servers utilizing the AuthMe pl
 
 PWAM introduces a password management system that securely auto-fills passwords and generates strong, unique passwords as needed.
 
-If you have any questions, please [join my Discord][Discord].
+If you have any questions, please [join my Discord][Discord] or refer to the [documentation][Docs].
 
 ## Compatibility
 
@@ -64,3 +64,4 @@ You can even use it in the singleplayer, if the server kicks you for standing to
 </details>
 
 [Discord]: https://discord.gg/EqhZfpwXmp
+[Docs]: https://github.com/turikhay/passwordmanager-for-authme/wiki
