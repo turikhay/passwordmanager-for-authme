@@ -4,7 +4,6 @@ import com.modrinth.minotaur.dependencies.DependencyType.REQUIRED
 import com.modrinth.minotaur.dependencies.ModDependency
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
-import net.fabricmc.loom.LoomRepositoryPlugin.forceLWJGLFromMavenCentral
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
 import net.fabricmc.loom.configuration.FabricApiExtension
 import net.fabricmc.loom.task.RemapJarTask
@@ -194,9 +193,6 @@ class FabricModPlugin : Plugin<Project> {
     }
 
     private fun Project.setupDependencies() {
-        // Loom will crash if not applied here
-        forceLWJGLFromMavenCentral(repositories)
-
         val prop = properties
         val fabricApi = extensions.getByName<FabricApiExtension>("fabricApi")
 
