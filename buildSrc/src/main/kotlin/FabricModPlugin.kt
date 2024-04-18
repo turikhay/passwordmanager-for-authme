@@ -28,6 +28,21 @@ private val fabricModulesDefault = listOf(
     "fabric-resource-loader-v0",
 )
 
+private val fabricDependencyModules = listOf(
+    FabricModuleDependency(
+        "fabric-api",
+        "P7dR8mSH",
+    ),
+    FabricModuleDependency(
+        "fabric-language-kotlin",
+        "Ha28R6CL",
+    ),
+    FabricModuleDependency(
+        "sqlite-jdbc",
+        "GAUIVqEJ",
+    ),
+)
+
 abstract class FabricModExtension(
     private val project: Project
 ) {
@@ -78,7 +93,11 @@ abstract class WriteFabricModJsonTask : DefaultTask() {
     val fabricModules: ListProperty<String> = project.objects.listProperty<String>().convention(
         project.provider {
             val v = mutableListOf<String>()
-            v.addAll(fabricModulesDefault)
+            if (project.modIncludeAll()) {
+                v.addAll(fabricModulesDefault)
+            } else {
+                v.addAll(fabricDependencyModules.map { it.module })
+            }
             v.addAll(
                 project.extensions.getByName<FabricModExtension>("fabricMod")
                     .fabricModules.get()
@@ -265,12 +284,12 @@ class FabricModPlugin : Plugin<Project> {
             gameVersions.addAll(provider {
                 extensions.getByType<FabricModExtension>().supportedVersions.get()
             })
-            val depType = if (modIncludeAll()) EMBEDDED else REQUIRED
-            dependencies = listOf(
-                ModDependency("P7dR8mSH", depType), // Fabric-API
-                ModDependency("Ha28R6CL", depType), // Fabric Language Kotlin
-                ModDependency("GAUIVqEJ", depType), // SQLite JDBC
-            )
+            dependencies = fabricDependencyModules.map {
+                ModDependency(
+                    it.modrinthId,
+                    if (modIncludeAll()) EMBEDDED else REQUIRED,
+                )
+            }
             syncBodyFrom = provider {
                 rootDir.resolve("README.md").readText()
             }
