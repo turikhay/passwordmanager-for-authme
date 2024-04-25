@@ -37,10 +37,6 @@ private val fabricDependencyModules = listOf(
         "fabric-language-kotlin",
         "Ha28R6CL",
     ),
-    FabricModuleDependency(
-        "sqlite-jdbc",
-        "GAUIVqEJ",
-    ),
 )
 
 abstract class FabricModExtension(

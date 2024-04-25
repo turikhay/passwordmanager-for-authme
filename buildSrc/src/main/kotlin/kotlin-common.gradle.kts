@@ -15,5 +15,5 @@ dependencies {
     includeable("io.github.oshai:kotlin-logging-jvm:6.0.3")
     includeable("org.jetbrains.exposed:exposed-core:$exposedVersion")
     includeable("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
-    maybeInclude("org.xerial:sqlite-jdbc:3.45.2.0")
+    includeable("org.xerial:sqlite-jdbc:3.45.2.0")
 }
