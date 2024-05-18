@@ -19,7 +19,6 @@ Please install the following dependencies before you can use PWAM:
 
 * [Fabric API](https://modrinth.com/mod/fabric-api)
 * [Fabric Language Kotlin](https://modrinth.com/mod/fabric-language-kotlin)
-* [SQLite JDBC](https://modrinth.com/plugin/sqlite-jdbc)
 
 ## How to use it?
 
