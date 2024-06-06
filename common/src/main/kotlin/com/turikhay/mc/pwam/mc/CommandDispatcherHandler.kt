@@ -15,6 +15,8 @@ import com.turikhay.mc.pwam.common.text.PasswordPairProvider
 import com.turikhay.mc.pwam.common.text.TextProvider
 import com.turikhay.mc.pwam.mc.BroadStringArgumentType.Companion.broadString
 import io.github.oshai.kotlinlogging.KotlinLogging
+import org.jetbrains.exposed.sql.Database
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
 private val logger = KotlinLogging.logger {}
@@ -26,7 +28,8 @@ class CommandDispatcherHandler(
     private val askServerSuggestion: IAskServerSuggestion,
     private val managementCmd: ManagementCmd<ICommandSource>,
     private val platformCommandDispatcher: PlatformCommandDispatcher,
-    private val executor: Executor
+    private val executor: Executor,
+    private val dbFuture: CompletableFuture<Database>,
 ) {
     private lateinit var plugin: KnownPlugin
     private val labels = ArrayList<String>()
@@ -108,6 +111,7 @@ class CommandDispatcherHandler(
                 platformCommandDispatcher,
                 executor,
                 managementCmd,
+                dbFuture,
             )
         }
     }

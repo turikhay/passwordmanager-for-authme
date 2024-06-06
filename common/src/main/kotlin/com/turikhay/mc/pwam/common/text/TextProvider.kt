@@ -8,15 +8,20 @@ fun interface TextProvider : Supplier<CompletableFuture<String?>>
 
 data class DelegateTextProvider(
     val name: String,
-    val executor: Executor,
-    val fn: () -> String?,
+    val fn: () -> CompletableFuture<String?>,
 ): TextProvider {
-    override fun get(): CompletableFuture<String?> =
-        CompletableFuture.supplyAsync(fn, executor)
+    override fun get(): CompletableFuture<String?> = fn()
 }
+
+fun provideText(
+    name: String,
+    fn: () -> CompletableFuture<String?>,
+) = DelegateTextProvider(name, fn)
 
 fun provideText(
     name: String,
     executor: Executor,
     fn: () -> String?,
-) = DelegateTextProvider(name, executor, fn)
+) = DelegateTextProvider(name) {
+    CompletableFuture.supplyAsync(fn, executor)
+}
