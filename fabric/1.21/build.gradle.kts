@@ -3,5 +3,5 @@ plugins {
 }
 
 fabricMod {
-    supportedVersions = listOf("24w19a")
+    supportedVersions = listOf("1.21.0")
 }
