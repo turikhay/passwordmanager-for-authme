@@ -4,6 +4,21 @@ plugins {
     kotlin("plugin.serialization") version "1.9.22"
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+kotlin {
+    target {
+        compilations.all {
+            kotlinOptions {
+                jvmTarget = JavaVersion.VERSION_21.toString()
+            }
+        }
+    }
+}
+
 repositories {
     maven {
         name = "Fabric"
