@@ -10,7 +10,7 @@ If you have any questions, please [join my Discord][Discord] or refer to the [do
 
 ## Compatibility
 
-This mod works with Minecraft 1.18.2, 1.19.4, 1.20.4 and 1.20.6.
+This mod works with Minecraft 1.18.2, 1.19.4, 1.20.x and 1.21.1.
 
 Plugins like LoginSecurity, OpeNLogin, LibreLogin and UserLogin are also supported.
 
