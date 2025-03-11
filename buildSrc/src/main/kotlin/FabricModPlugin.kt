@@ -221,6 +221,7 @@ class FabricModPlugin : Plugin<Project> {
                 it("net.kyori:adventure-key:4.19.0")
                 it("net.kyori:examination-api:1.3.0")
                 it("net.kyori:examination-string:1.3.0")
+                it("net.kyori:adventure-text-serializer-json:4.19.0")
                 it("net.kyori:adventure-text-serializer-gson:4.19.0")
             }
 
