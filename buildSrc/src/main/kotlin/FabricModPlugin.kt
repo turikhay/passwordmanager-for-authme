@@ -215,12 +215,6 @@ class FabricModPlugin : Plugin<Project> {
             fabricModulesDefault.map { id ->
                 maybeInclude()(fabricApi.module(id, fabricVersion()))
             }
-            adventure().let {
-                it("net.kyori:adventure-key")
-                it("net.kyori:examination-api")
-                it("net.kyori:examination-string")
-                it("net.kyori:adventure-text-serializer-gson")
-            }
 
             impl()(project(":common"))
             config("minecraft")("com.mojang:minecraft:${minecraftVersion()}")
