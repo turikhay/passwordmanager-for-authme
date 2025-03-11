@@ -173,7 +173,7 @@ class FabricModPlugin : Plugin<Project> {
     }
 
     private fun Project.createTasks() {
-        tasks.create<WriteFabricModJsonTask>(
+        tasks.register<WriteFabricModJsonTask>(
             "writeFabricModJson",
         ) {
             listOf(
@@ -181,7 +181,7 @@ class FabricModPlugin : Plugin<Project> {
                 "jar",
             ).forEach {
                 tasks.named(it) {
-                    dependsOn(this@create)
+                    dependsOn(this@register)
                 }
             }
             mustRunAfter("processResources")
