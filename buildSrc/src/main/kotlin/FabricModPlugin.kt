@@ -216,10 +216,10 @@ class FabricModPlugin : Plugin<Project> {
                 maybeInclude()(fabricApi.module(id, fabricVersion()))
             }
             adventure().let {
-                it("net.kyori:adventure-key")
-                it("net.kyori:examination-api")
-                it("net.kyori:examination-string")
-                it("net.kyori:adventure-text-serializer-gson")
+                it("net.kyori:adventure-key:4.19.0")
+                it("net.kyori:examination-api:1.3.0")
+                it("net.kyori:examination-string:1.3.0")
+                it("net.kyori:adventure-text-serializer-gson:4.19.0")
             }
 
             impl()(project(":common"))
