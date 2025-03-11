@@ -43,12 +43,7 @@ configurations {
 dependencies {
     implementation("com.mojang:brigadier:1.1.8")
 
-    val adventureVersion = "4.19.0"
-    adventure("net.kyori:adventure-api:${adventureVersion}")
-    adventure("net.kyori:adventure-text-serializer-gson:${adventureVersion}")
-    adventure("net.kyori:adventure-key:${adventureVersion}")
-    adventure("net.kyori:examination-api:1.3.0")
-    adventure("net.kyori:examination-string:1.3.0")
+    adventure("net.kyori:adventure-api:4.19.0")
 
     implementation("com.google.guava:guava:33.1.0-jre")
 
