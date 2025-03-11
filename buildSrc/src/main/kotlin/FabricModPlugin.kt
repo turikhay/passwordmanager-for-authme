@@ -5,7 +5,7 @@ import com.modrinth.minotaur.dependencies.ModDependency
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.configuration.FabricApiExtension
+import net.fabricmc.loom.api.fabricapi.FabricApiExtension
 import net.fabricmc.loom.task.RemapJarTask
 import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
