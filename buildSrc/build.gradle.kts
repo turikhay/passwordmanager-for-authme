@@ -40,7 +40,7 @@ gradlePlugin {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("net.fabricmc:fabric-loom:1.6-SNAPSHOT")
+    implementation("net.fabricmc:fabric-loom:1.10-SNAPSHOT")
     implementation("com.modrinth.minotaur:Minotaur:2.+")
     implementation("net.swiftzer.semver:semver:1.3.0")
 }

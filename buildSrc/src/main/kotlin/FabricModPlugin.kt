@@ -5,7 +5,8 @@ import com.modrinth.minotaur.dependencies.ModDependency
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.*
 import net.fabricmc.loom.api.LoomGradleExtensionAPI
-import net.fabricmc.loom.configuration.FabricApiExtension
+import net.fabricmc.loom.api.fabricapi.FabricApiExtension
+import net.fabricmc.loom.build.nesting.NestableJarGenerationTask
 import net.fabricmc.loom.task.RemapJarTask
 import net.swiftzer.semver.SemVer
 import org.gradle.api.DefaultTask
@@ -192,19 +193,20 @@ class FabricModPlugin : Plugin<Project> {
 
     private fun Project.setupConfigurations() {
         configurations {
+            var includeFinal = register("includeFinal")
+            includeFinal.extendsFrom(includeable())
+            val fabricModule = register("fabricModule")
+            if (modIncludeAll()) {
+                includeFinal.extendsFrom(fabricModule)
+            }
             maybeInclude().let {
-                modImpl().extendsFrom(it)
                 if (modIncludeAll()) {
-                    include().extendsFrom(it)
+                    includeable().extendsFrom(it)
                 }
             }
-            named("includeable").let {
-                impl().extendsFrom(it)
-                include().extendsFrom(it)
-            }
+            impl().extendsFrom(includeable())
             adventure().let {
-                modImpl().extendsFrom(it)
-                include().extendsFrom(it)
+                includeable().extendsFrom(it)
             }
         }
     }
@@ -215,7 +217,7 @@ class FabricModPlugin : Plugin<Project> {
 
         dependencies {
             fabricModulesDefault.map { id ->
-                maybeInclude()(fabricApi.module(id, fabricVersion()))
+                config("fabricModule")(fabricApi.module(id, fabricVersion()))
             }
             adventure().let {
                 it("net.kyori:adventure-text-serializer-gson:${prop["adventure_version"]}")
@@ -244,6 +246,9 @@ class FabricModPlugin : Plugin<Project> {
                     "pwma.refmap.json"
                 )
             }
+        }
+        project.tasks.named<NestableJarGenerationTask>("processIncludeJars") {
+            from(config("includeFinal").get())
         }
     }
 
@@ -313,8 +318,8 @@ class FabricModPlugin : Plugin<Project> {
     private fun Project.maybeInclude() =
         config("maybeInclude")
 
-    private fun Project.include() =
-        config("include")
+    private fun Project.includeable() =
+        config("includeable")
 
     private fun Project.impl() =
         config("implementation")
