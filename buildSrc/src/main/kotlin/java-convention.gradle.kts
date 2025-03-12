@@ -43,7 +43,7 @@ configurations {
 dependencies {
     implementation("com.mojang:brigadier:1.1.8")
 
-    adventure("net.kyori:adventure-api:4.19.0")
+    adventure("net.kyori:adventure-api:${properties["adventure_version"]}")
 
     implementation("com.google.guava:guava:33.1.0-jre")
 
