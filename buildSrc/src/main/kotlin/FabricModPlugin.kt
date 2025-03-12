@@ -195,6 +195,10 @@ class FabricModPlugin : Plugin<Project> {
         configurations {
             var includeFinal = register("includeFinal")
             includeFinal.extendsFrom(includeable())
+            val fabricModule = register("fabricModule")
+            if (modIncludeAll()) {
+                includeFinal.extendsFrom(fabricModule)
+            }
             maybeInclude().let {
                 if (modIncludeAll()) {
                     includeable().extendsFrom(it)
@@ -213,7 +217,7 @@ class FabricModPlugin : Plugin<Project> {
 
         dependencies {
             fabricModulesDefault.map { id ->
-                config("includeFinal")(fabricApi.module(id, fabricVersion()))
+                config("fabricModule")(fabricApi.module(id, fabricVersion()))
             }
             adventure().let {
                 it("net.kyori:adventure-text-serializer-gson:${prop["adventure_version"]}")
