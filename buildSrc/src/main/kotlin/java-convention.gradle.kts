@@ -43,9 +43,7 @@ configurations {
 dependencies {
     implementation("com.mojang:brigadier:1.1.8")
 
-    // Locked at the version that was released for Minecraft 1.18.x
-    // If other mods use newer versions of Adventure, Fabric will upgrade this dependency (right?)
-    adventure("net.kyori:adventure-api:4.9.3")
+    adventure("net.kyori:adventure-api:${properties["adventure_version"]}")
 
     implementation("com.google.guava:guava:33.1.0-jre")
 
