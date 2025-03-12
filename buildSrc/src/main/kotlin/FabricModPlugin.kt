@@ -227,7 +227,7 @@ class FabricModPlugin : Plugin<Project> {
             config("mappings")("net.fabricmc:yarn:${prop["yarn_mappings"]}:v2")
             modImpl()("net.fabricmc:fabric-loader:${prop["loader_version"]}")
             modImpl()("net.fabricmc.fabric-api:fabric-api:${prop["fabric_version"]}")
-            maybeInclude()("net.fabricmc:fabric-language-kotlin:1.10.19+kotlin.1.9.23")
+            maybeInclude()("net.fabricmc:fabric-language-kotlin:1.12.3+kotlin.2.0.21")
         }
     }
 
