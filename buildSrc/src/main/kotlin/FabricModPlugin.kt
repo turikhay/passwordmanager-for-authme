@@ -193,15 +193,15 @@ class FabricModPlugin : Plugin<Project> {
 
     private fun Project.setupConfigurations() {
         configurations {
+            var includeFinal = register("includeFinal")
+            includeFinal.extendsFrom(includeable())
             maybeInclude().let {
-                modImpl().extendsFrom(it)
                 if (modIncludeAll()) {
                     includeable().extendsFrom(it)
                 }
             }
             impl().extendsFrom(includeable())
             adventure().let {
-                modImpl().extendsFrom(it)
                 includeable().extendsFrom(it)
             }
         }
@@ -213,7 +213,7 @@ class FabricModPlugin : Plugin<Project> {
 
         dependencies {
             fabricModulesDefault.map { id ->
-                maybeInclude()(fabricApi.module(id, fabricVersion()))
+                config("includeFinal")(fabricApi.module(id, fabricVersion()))
             }
             adventure().let {
                 it("net.kyori:adventure-text-serializer-gson:${prop["adventure_version"]}")
@@ -224,7 +224,7 @@ class FabricModPlugin : Plugin<Project> {
             config("mappings")("net.fabricmc:yarn:${prop["yarn_mappings"]}:v2")
             modImpl()("net.fabricmc:fabric-loader:${prop["loader_version"]}")
             modImpl()("net.fabricmc.fabric-api:fabric-api:${prop["fabric_version"]}")
-            maybeInclude()("net.fabricmc:fabric-language-kotlin:1.10.19+kotlin.1.9.23")
+            maybeInclude()("net.fabricmc:fabric-language-kotlin:1.12.3+kotlin.2.0.21")
         }
     }
 
@@ -244,7 +244,7 @@ class FabricModPlugin : Plugin<Project> {
             }
         }
         project.tasks.named<NestableJarGenerationTask>("processIncludeJars") {
-            from(includeable().get())
+            from(config("includeFinal").get())
         }
     }
 
