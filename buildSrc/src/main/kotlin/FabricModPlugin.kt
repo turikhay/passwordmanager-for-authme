@@ -199,9 +199,7 @@ class FabricModPlugin : Plugin<Project> {
                     includeable().extendsFrom(it)
                 }
             }
-            named("includeable").let {
-                impl().extendsFrom(it)
-            }
+            impl().extendsFrom(includeable())
             adventure().let {
                 modImpl().extendsFrom(it)
                 includeable().extendsFrom(it)
