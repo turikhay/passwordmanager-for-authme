@@ -1,0 +1,1 @@
+../../../../../../../../../../1.18.2/src/main/kotlin/com/turikhay/mc/pwam/fabric/platform/AdventureJsonVersion.kt
