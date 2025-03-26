@@ -5,6 +5,7 @@ import com.turikhay.mc.pwam.common.initDb
 import com.turikhay.mc.pwam.fabric.common.FabricAskServerSuggestion
 import com.turikhay.mc.pwam.fabric.common.FabricCommandNodeAccessor
 import com.turikhay.mc.pwam.fabric.platform.SUPPORTS_EMOJI
+import com.turikhay.mc.pwam.fabric.platform.adventureJsonVersion
 import com.turikhay.mc.pwam.fabric.platform.deserializeComponent
 import com.turikhay.mc.pwam.mc.IClient
 import com.turikhay.mc.pwam.mc.Session
@@ -14,7 +15,9 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents
 import net.fabricmc.loader.api.FabricLoader
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer
+import net.kyori.adventure.text.serializer.json.JSONOptions
 import net.kyori.adventure.translation.GlobalTranslator
+import net.minecraft.SharedConstants
 import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Util
 import org.jetbrains.exposed.sql.Database
@@ -70,10 +73,19 @@ private object Client : IClient {
             command,
         )
 
+    val gsonSerializer: GsonComponentSerializer by lazy {
+        GsonComponentSerializer.builder()
+            .options(
+                JSONOptions.byDataVersion()
+                    .at(adventureJsonVersion())
+            )
+            .build()
+    }
+
     override fun sendMessage(text: Component) {
         client().inGameHud.chatHud.addMessage(
             deserializeComponent(
-                GsonComponentSerializer.gson().serializeToTree(
+                gsonSerializer.serializeToTree(
                     GlobalTranslator.render(text, Locale.getDefault())
                 )
             )
