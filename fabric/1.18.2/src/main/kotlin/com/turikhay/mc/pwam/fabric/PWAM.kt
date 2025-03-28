@@ -5,7 +5,6 @@ import com.turikhay.mc.pwam.common.initDb
 import com.turikhay.mc.pwam.fabric.common.FabricAskServerSuggestion
 import com.turikhay.mc.pwam.fabric.common.FabricCommandNodeAccessor
 import com.turikhay.mc.pwam.fabric.platform.SUPPORTS_EMOJI
-import com.turikhay.mc.pwam.fabric.platform.adventureJsonVersion
 import com.turikhay.mc.pwam.fabric.platform.deserializeComponent
 import com.turikhay.mc.pwam.mc.IClient
 import com.turikhay.mc.pwam.mc.Session
@@ -77,7 +76,7 @@ private object Client : IClient {
         GsonComponentSerializer.builder()
             .options(
                 JSONOptions.byDataVersion()
-                    .at(adventureJsonVersion())
+                    .at(SharedConstants.getGameVersion().saveVersion.id)
             )
             .build()
     }
