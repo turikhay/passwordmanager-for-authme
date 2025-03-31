@@ -4,12 +4,13 @@ import com.turikhay.mc.pwam.common.*
 import com.turikhay.mc.pwam.common.text.*
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
 class Session(
     client: IClient,
     private val info: SessionInfo,
-    private val db: Database,
+    private val dbFuture: CompletableFuture<Database>,
     executor: Executor,
     commandNodeAccessor: ICommandNodeAccessor<ICommandSource>,
     askServerSuggestion: IAskServerSuggestion,
@@ -28,9 +29,11 @@ class Session(
 
     private val loginPwdProvider = CacheableTextProvider(
         PatternAwarePasswordGenerator(
-            provideText("login", executor) {
-                transaction(db) {
-                    getPassword(info.username, info.server)
+            provideText("login") {
+                dbFuture.thenApply { db ->
+                    transaction(db) {
+                        getPassword(info.username, info.server)
+                    }
                 }
             },
             pattern,
@@ -85,7 +88,6 @@ class Session(
         commandNodeAccessor,
         askServerSuggestion,
         ManagementCmd(
-            db,
             pattern,
             info,
             client,
@@ -94,10 +96,11 @@ class Session(
         ),
         client,
         executor,
+        dbFuture,
     )
 
     override fun changePassword(newPassword: String) {
-        transaction(db) {
+        transaction(dbFuture.getNowOrFail()) {
             setPassword(
                 info.username,
                 info.server,

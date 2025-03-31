@@ -7,11 +7,9 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder.literal
 import com.mojang.brigadier.builder.RequiredArgumentBuilder
 import com.mojang.brigadier.builder.RequiredArgumentBuilder.argument
 import com.mojang.brigadier.context.CommandContext
-import com.mojang.brigadier.suggestion.Suggestions
 import com.turikhay.mc.pwam.common.*
 import com.turikhay.mc.pwam.common.andWhere
 import com.turikhay.mc.pwam.mc.BroadStringArgumentType.Companion.broadString
-import net.kyori.adventure.audience.Audience
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.Component.*
 import net.kyori.adventure.text.TextComponent
@@ -47,7 +45,6 @@ private val COLUMN_LIST = listOf(
 )
 
 class ManagementCmd<C>(
-    private val db: Database,
     private val patternFactory: PasswordPattern,
     private val sessionInfo: SessionInfo,
     private val audience: PlatformAudience,
@@ -78,7 +75,7 @@ class ManagementCmd<C>(
         val offset = (pageArg.toLong() - 1) * PER_PAGE
         var pagesTotal: Long = 0
 
-        fun run() {
+        fun run(db: Database) {
             var rows: List<PwdRow> = emptyList()
             transaction(db) {
                 val count = PasswordEntry.selectAll().setWhere().count()
@@ -284,16 +281,17 @@ class ManagementCmd<C>(
 
     fun listPasswords(
         ctx: CommandContext<C>,
-    ) = ListPasswords(ctx).run()
+        database: Database,
+    ) = ListPasswords(ctx).run(database)
 
-    fun suggestServerList(ctx: CommandContext<C>): List<String> {
+    fun suggestServerList(ctx: CommandContext<C>, database: Database): List<String> {
         val serverArg = ctx.getArgumentSafely("server")
-        return suggest(PasswordEntry.server, serverArg, listOf(HERE, ALL_SERVERS))
+        return suggest(PasswordEntry.server, serverArg, listOf(HERE, ALL_SERVERS), database)
     }
 
-    fun suggestUsernames(ctx: CommandContext<C>): List<String> {
+    fun suggestUsernames(ctx: CommandContext<C>, database: Database): List<String> {
         val usernameArg = ctx.getArgumentSafely("username")
-        return suggest(PasswordEntry.username, usernameArg, listOf(ALL_USERS))
+        return suggest(PasswordEntry.username, usernameArg, listOf(ALL_USERS), database)
     }
 
     fun setAsCurrent(ctx: CommandContext<C>) {
@@ -301,9 +299,9 @@ class ManagementCmd<C>(
         passwordChangeCallback.changePassword(password)
     }
 
-    fun removeById(ctx: CommandContext<C>) {
+    fun removeById(ctx: CommandContext<C>, database: Database) {
         val id = ctx.getArgument("id", Integer::class.java).toInt()
-        transaction(db) {
+        transaction(database) {
             val count = PasswordEntry.update(
                 where = {
                     (PasswordEntry.id eq id) and (
@@ -336,9 +334,14 @@ class ManagementCmd<C>(
         }
     }
 
-    private fun suggest(column: Column<String>, argument: String?, placeholders: List<String>): List<String> {
+    private fun suggest(
+        column: Column<String>,
+        argument: String?,
+        placeholders: List<String>,
+        database: Database
+    ): List<String> {
         val list = mutableListOf<String>()
-        transaction(db) {
+        transaction(database) {
             val query = PasswordEntry
                 .select(column)
                 .withDistinct(true)
@@ -380,33 +383,39 @@ class ManagementCmd<C>(
             platformDispatcher: PlatformCommandDispatcher,
             executor: Executor,
             cmd: ManagementCmd<ICommandSource>,
+            dbFuture: CompletableFuture<Database>,
         ) {
-            fun <C, T: ArgumentBuilder<C, T>> T.executesLater(cmd: (CommandContext<C>) -> Unit): T {
+            fun <C, T: ArgumentBuilder<C, T>> T.executesImmediately(cmd: (CommandContext<C>) -> Any): T {
                 return executes { ctx ->
                     platformDispatcher.addCommandToHistory(ctx.input)
-                    executor.execute {
-                        cmd(ctx)
-                    }
+                    cmd(ctx)
                     0
+                }
+            }
+            fun <C, T: ArgumentBuilder<C, T>> T.executesWithDb(cmd: (CommandContext<C>, Database) -> Unit): T {
+                return executesImmediately { ctx ->
+                    dbFuture.thenApplyAsync ({ db ->
+                        cmd(ctx, db)
+                    }, executor)
                 }
             }
             val pageParam =
                 argument<ICommandSource, Int>("page", integer(1))
-                    .executesLater(cmd::listPasswords)
+                    .executesWithDb(cmd::listPasswords)
             val usernameParam = argument<ICommandSource, String>("username", broadString())
-                .executesLater(cmd::listPasswords)
-                .suggestsLater(executor, cmd::suggestUsernames)
+                .executesWithDb(cmd::listPasswords)
+                .suggestsWithDb(executor, dbFuture, cmd::suggestUsernames)
                 .then(pageParam)
             dispatcher.register(
                 literal<ICommandSource>(LABEL)
-                    .executesLater { cmd.about() }
+                    .executesImmediately { cmd.about() }
                     .then(
                         literal<ICommandSource>("list")
-                            .executesLater(cmd::listPasswords)
+                            .executesWithDb(cmd::listPasswords)
                             .then(
                                 argument<ICommandSource, String>("server", broadString())
-                                    .executesLater(cmd::listPasswords)
-                                    .suggestsLater(executor, cmd::suggestServerList)
+                                    .executesWithDb(cmd::listPasswords)
+                                    .suggestsWithDb(executor, dbFuture, cmd::suggestServerList)
                                     .then(pageParam)
                                     .then(usernameParam)
                             )
@@ -415,14 +424,14 @@ class ManagementCmd<C>(
                         literal<ICommandSource>("set")
                             .then(
                                 argument<ICommandSource, String>("password", broadString())
-                                    .executesLater(cmd::setAsCurrent)
+                                    .executesImmediately(cmd::setAsCurrent)
                             )
                     )
                     .then(
                         literal<ICommandSource>("removeById")
                             .then(
                                 argument<ICommandSource, Int>("id", integer())
-                                    .executesLater(cmd::removeById)
+                                    .executesWithDb(cmd::removeById)
                             )
                     )
             )
@@ -430,17 +439,16 @@ class ManagementCmd<C>(
     }
 }
 
-private fun <C, V, T: RequiredArgumentBuilder<C, V>> T.suggestsLater(
+private fun <C, V, T: RequiredArgumentBuilder<C, V>> T.suggestsWithDb(
     executor: Executor,
-    provider: (CommandContext<C>) -> List<String>
+    dbFuture: CompletableFuture<Database>,
+    provider: (CommandContext<C>, Database) -> List<String>
 ): RequiredArgumentBuilder<C, V> {
     return suggests { ctx, builder ->
-        val f = CompletableFuture<Suggestions>()
-        executor.execute {
-            val suggestions = provider(ctx)
+        dbFuture.thenApplyAsync({ db ->
+            val suggestions = provider(ctx, db)
             suggestions.forEach { builder.suggest(it) }
-            f.complete(builder.build())
-        }
-        f
+            builder.build()
+        }, executor)
     }
 }

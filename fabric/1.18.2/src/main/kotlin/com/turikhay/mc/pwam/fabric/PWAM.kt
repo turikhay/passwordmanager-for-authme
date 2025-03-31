@@ -1,7 +1,7 @@
 package com.turikhay.mc.pwam.fabric
 
 import com.turikhay.mc.pwam.common.PasswordPattern
-import com.turikhay.mc.pwam.common.initDb
+import com.turikhay.mc.pwam.common.initDbLater
 import com.turikhay.mc.pwam.fabric.common.FabricAskServerSuggestion
 import com.turikhay.mc.pwam.fabric.common.FabricCommandNodeAccessor
 import com.turikhay.mc.pwam.fabric.platform.SUPPORTS_EMOJI
@@ -21,13 +21,14 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.util.Util
 import org.jetbrains.exposed.sql.Database
 import java.util.*
+import java.util.concurrent.CompletableFuture
 
 class PWAM : ModInitializer {
-    private lateinit var db: Database
+    private lateinit var dbFuture: CompletableFuture<Database>
 
     override fun onInitialize() {
         INSTANCE = this
-        db = initDb()
+        dbFuture = initDbLater(worker)
         initEvents()
     }
 
@@ -41,8 +42,8 @@ class PWAM : ModInitializer {
                         if (isLocal) "local" else address.toString()
                     },
                 ),
-                db,
-                Util.getMainWorkerExecutor(),
+                dbFuture,
+                worker,
                 FabricCommandNodeAccessor(),
                 FabricAskServerSuggestion(),
                 PasswordPattern(SUPPORTS_EMOJI),
@@ -52,6 +53,10 @@ class PWAM : ModInitializer {
             Session.session?.cleanUp()
             Session.session = null
         }
+    }
+
+    private val worker by lazy {
+        Util.getMainWorkerExecutor()
     }
 
     companion object {
